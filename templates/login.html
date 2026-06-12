@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1>Life Tracker</h1>
+<h2>Login</h2>
+
+
+<!--
+登录表单，让he用户输入邮箱和密码
+1. email输入框
+2. password输入框
+3. Login提交按钮
+点击 Login 后，表单里的数据会发送给 app.py
+-->
+<form method="post">
+
+  <label>Your name</label>
+  <input type = "name" name = "name">
+  
+  <label>Email</label>
+  <input type="email" name="email">
+
+  <label>Password</label>
+  <input type="password" name="password">
+
+  <button type="submit">Login</button>
+</form>
+
+
+{% endblock %}
