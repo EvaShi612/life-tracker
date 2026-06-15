@@ -1,12 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 #Flask：创建网站
 #render_template：打开HTML页面
 #request：获取用户提交的数据
 #redirect：跳转页面
 #url_for：根据函数名寻找网址
+#session:记住当前登录的人
 import sqlite3
 
 app = Flask(__name__)
+app.secret_key = "life-tracker-secret-key"
 
 @app.route("/")
 def home():
@@ -28,7 +30,8 @@ def login():
         conn.close()
 
         if user:
-            return redirect(url_for("dashboard", email=email))
+            session["user_email"] = email
+            return redirect(url_for("dashboard"))
         else:
             return "Login failed"
 
@@ -36,7 +39,7 @@ def login():
 
 # 访问 /register，执行 register()，打开 register.html
 # GET：显示注册页面
-# POST：接收注册表单，并把用户存进 users 表
+# POST：接收注册表单，把用户存进 users 表
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -61,13 +64,21 @@ def register():
 # 访问 /dashboard，执行 dashboard()，显示 dashboard.html
 @app.route("/dashboard")
 def dashboard():
-    email = request.args.get("email"
-                             )
+    email = session.get("user_email")
+
+    if not email:
+        return redirect(url_for("login"))
+
     return render_template(
         "dashboard.html",
         email=email
     )
 
+# 访问 /logout，清除登录状态，然后回到 login 页面
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 
 if __name__ == "__main__":
     app.run(debug=True)
