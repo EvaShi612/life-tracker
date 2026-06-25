@@ -56,7 +56,6 @@ def register():
         conn.close()
 
         print("User saved!")
-
         return redirect(url_for("login"))
 
     return render_template("register.html")

@@ -5,6 +5,9 @@
 
 <p>Welcome !{{email}}</p>
 <p>What do you want to do today?</p>
-
+<!--退出登录，点击后去logout-->
+<a href="{{ url_for('logout') }}">
+    Logout
+</a>
 
 {% endblock %}
