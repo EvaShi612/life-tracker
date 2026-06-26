@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.security import generate_password_hash,check_password_hash
 #Flask：创建网站
 #render_template：打开HTML页面
 #request：获取用户提交的数据
@@ -24,13 +25,14 @@ def login():
 
         conn = sqlite3.connect("life_tracker.db")
         user = conn.execute(
-            "SELECT * FROM users WHERE email = ? AND password = ?",
-            (email, password)
+            "SELECT * FROM users WHERE email = ? ",
+            (email,)
         ).fetchone()
         conn.close()
-
-        if user:
+        print(user)
+        if user and check_password_hash(user[3],password):
             session["user_email"] = email
+            
             return redirect(url_for("dashboard"))
         else:
             return "Login failed"
@@ -47,10 +49,12 @@ def register():
         email = request.form.get("email")
         password = request.form.get("password")
 
+        hashed_password = generate_password_hash(password)
+
         conn = sqlite3.connect("life_tracker.db")
         conn.execute(
             "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-            (name, email, password)
+            (name, email, hashed_password)
         )
         conn.commit()
         conn.close()
