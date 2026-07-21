@@ -15,7 +15,7 @@ app.secret_key = "life-tracker-secret-key"
 def home():
     return "Life Tracker is running!"
 
-
+ 
 # 访问 /login，执行 login()，打开 login.html
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -83,5 +83,35 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
+
+@app.route("/create", methods=["GET", "POST"])
+def create_habit():
+    if request.method == "POST":
+        habit_name = request.form.get("habit_name")
+
+        conn= sqlite3.connect("life_tracker.db")
+        conn.execute(
+            "INSERT INTO habits (user_email, habit_name) VALUES (?, ?)",
+            (session["user_email"], habit_name)
+        )
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for("dashboard"))
+    return render_template("create_habit.html")
+
+def create_habits_table():
+    conn = sqlite3.connect("life_tracker.db")
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS habits (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_email TEXT NOT NULL,
+            habit_name TEXT NOT NULL
+        )
+    """)
+    conn.commit()
+    conn.close()
+
 if __name__ == "__main__":
+    create_habits_table()
     app.run(debug=True)

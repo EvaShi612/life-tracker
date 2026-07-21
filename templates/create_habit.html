@@ -1,0 +1,14 @@
+<!--继承layout.html-->
+{%extends "layout.html"%}
+{%block body%}
+<h1>Create Habit</h1>
+
+<form method="POST">
+    <label>Habit Name</label>
+    <input type="text" name="habit_name">
+    <button type="submit">Save</button>
+</form>
+
+<a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+
+{% endblock %}
