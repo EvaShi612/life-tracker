@@ -68,13 +68,21 @@ def register():
 @app.route("/dashboard")
 def dashboard():
     email = session.get("user_email")
-
     if not email:
         return redirect(url_for("login"))
+    conn = sqlite3.connect("life_tracker.db")
 
+    habits = conn.execute(
+        "SELECT habit_name FROM habits WHERE user_email = ?",
+        (email,)
+    ).fetchall()
+
+    conn.close()
+    
     return render_template(
         "dashboard.html",
-        email=email
+        email=email,
+        habits=habits
     )
 
 # 访问 /logout，清除登录状态，然后回到 login 页面
@@ -100,18 +108,6 @@ def create_habit():
         return redirect(url_for("dashboard"))
     return render_template("create_habit.html")
 
-def create_habits_table():
-    conn = sqlite3.connect("life_tracker.db")
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS habits (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_email TEXT NOT NULL,
-            habit_name TEXT NOT NULL
-        )
-    """)
-    conn.commit()
-    conn.close()
 
 if __name__ == "__main__":
-    create_habits_table()
     app.run(debug=True)
