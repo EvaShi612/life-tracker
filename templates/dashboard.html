@@ -1,15 +1,63 @@
 {% extends "layout.html" %}
 
 {% block body %}
+
 <h1>Dashboard</h1>
 
-<p>Welcome !{{email}}</p>
-<p>What do you want to do today?</p>
-<!--退出登录，点击后去logout-->
-<a href="{{ url_for('logout') }}">
-    Logout
-</a>
+<p>Logged in as: {{ email }}</p>
+<!-- 创建新 habit 的按钮 -->
+<a href="{{ url_for('create_habit') }}">Create Habit</a>
 
-<a href="{{ url_for('create_habit') }}">Add Habit</a>
+<hr>
+{% if habits %}
+    {% for habit in habits %}
+
+        <div>
+
+            <!--
+            habit[1] 是 habit_name
+            因为 app.py 查询顺序是：
+            SELECT id, habit_name, details
+            -->
+            <h3>{{ habit[1] }}</h3>
+
+            <!-- habit[2] 是 details -->
+            <p>{{ habit[2] }}</p>
+
+            <!--
+            Edit 按钮
+
+            habit[0] 是这条 habit 的 id。
+            例如 id 是 3，就会生成 /edit/3
+            -->
+            <a href="{{ url_for('edit_habit', habit_id=habit[0]) }}">
+                Edit
+            </a>
+
+            <!--
+            Delete 按钮
+
+            例如 id 是 3，就会生成 /delete/3
+            -->
+            <a href="{{ url_for('delete_habit', habit_id=habit[0]) }}">
+                Delete
+            </a>
+
+        </div>
+
+        <hr>
+
+    {% endfor %}
+
+<!-- 如果用户还没有 habits -->
+{% else %}
+
+    <p>You do not have any habits yet.</p>
+
+{% endif %}
+
+<br>
+
+<a href="{{ url_for('logout') }}">Logout</a>
 
 {% endblock %}

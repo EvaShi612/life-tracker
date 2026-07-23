@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<h1>Edit Habit</h1>
+
+<!--
+这个 form 用来修改 Habit。
+method="POST" 表示点击 Save Changes 后，
+会把资料送回 app.py 的 edit_habit()。
+-->
+<form method="POST">
+
+    <!-- Habit Name 标签 -->
+    <label>Habit Name</label><br>
+    <!--
+    value="{{ habit[2] }}"
+        自动把数据库原本的 Habit Name 放进输入框
+    required
+        不允许留空
+    -->
+    <input
+        type="text"
+        name="habit_name"
+        value="{{ habit[2] }}"
+        required
+    >
+
+    <br><br>
+
+    <!-- 标签 -->
+    <label>Details</label><br>
+
+    <!--
+    多行文字输入框，四行高，大约40个字宽
+
+    {{ habit[3] }}
+        自动把数据库原本的 Details 放进去
+    -->
+    <textarea
+        name="details"
+        rows="4"
+        cols="40"
+    >{{ habit[3] }}</textarea>
+
+    <br><br>
+
+    <button type="submit">Save Changes</button>
+
+</form>
+<br>
+
+<a href="{{ url_for('dashboard') }}">
+    Back to Dashboard
+</a>
+{% endblock %}

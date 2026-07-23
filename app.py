@@ -68,13 +68,19 @@ def register():
 @app.route("/dashboard")
 def dashboard():
     email = session.get("user_email")
+
     if not email:
         return redirect(url_for("login"))
+    
     conn = sqlite3.connect("life_tracker.db")
 
     habits = conn.execute(
-        "SELECT habit_name FROM habits WHERE user_email = ?",
-        (email,)
+    """
+    SELECT id, habit_name, details
+    FROM habits
+    WHERE user_email = ?
+    """,
+    (email,)
     ).fetchall()
 
     conn.close()
@@ -91,16 +97,25 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
-
+#habit部分，接下两段包含delete和edit
 @app.route("/create", methods=["GET", "POST"])
 def create_habit():
+
+    # 如果没有登录，就回到 Login
+    if "user_email" not in session:
+        return redirect(url_for("login"))
+    
     if request.method == "POST":
         habit_name = request.form.get("habit_name")
+        details = request.form.get("details")
 
-        conn= sqlite3.connect("life_tracker.db")
+        conn = sqlite3.connect("life_tracker.db")
         conn.execute(
-            "INSERT INTO habits (user_email, habit_name) VALUES (?, ?)",
-            (session["user_email"], habit_name)
+            """
+            INSERT INTO habits (user_email, habit_name, details)
+            VALUES (?, ?, ?)
+            """,
+            (session["user_email"], habit_name, details)
         )
         conn.commit()
         conn.close()
@@ -108,6 +123,59 @@ def create_habit():
         return redirect(url_for("dashboard"))
     return render_template("create_habit.html")
 
+#habit的delete
+@app.route("/delete/<int:habit_id>")
+def delete_habit(habit_id):
+
+        # 如果没有登录，就回到 Login
+    if "user_email" not in session:
+        return redirect(url_for("login"))
+    
+    conn = sqlite3.connect("life_tracker.db")
+
+    conn.execute(
+        "DELETE FROM habits WHERE id = ?",
+        (habit_id,)
+    )
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for("dashboard"))
+
+#habit的edit
+@app.route("/edit/<int:habit_id>", methods=["GET", "POST"])
+def edit_habit(habit_id):
+
+        # 如果没有登录，就回到 Login
+    if "user_email" not in session:
+        return redirect(url_for("login"))
+    
+    conn = sqlite3.connect("life_tracker.db")
+    if request.method == "POST":
+        habit_name = request.form.get("habit_name")
+        details = request.form.get("details")
+        conn.execute(
+            """
+            UPDATE habits
+            SET habit_name = ?, details = ?
+            WHERE id = ?
+            """,
+            (habit_name, details, habit_id)
+        )
+        conn.commit()
+        conn.close()
+        return redirect(url_for("dashboard"))
+    habit = conn.execute(
+        """
+        SELECT *
+        FROM habits
+        WHERE id = ?
+        """,
+        (habit_id,)
+    ).fetchone()
+    conn.close()
+
+    return render_template("edit_habit.html", habit=habit)
 
 if __name__ == "__main__":
     app.run(debug=True)
