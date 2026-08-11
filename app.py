@@ -177,5 +177,35 @@ def edit_habit(habit_id):
 
     return render_template("edit_habit.html", habit=habit)
 
+def update_habits_table():
+    conn = sqlite3.connect("life_tracker.db")
+
+    columns = conn.execute("PRAGMA table_info(habits)").fetchall()
+    column_names = [column[1] for column in columns]
+
+    if "category" not in column_names:
+        conn.execute(
+            "ALTER TABLE habits ADD COLUMN category TEXT DEFAULT 'Other'"
+        )
+
+    if "frequency" not in column_names:
+        conn.execute(
+            "ALTER TABLE habits ADD COLUMN frequency TEXT DEFAULT 'Daily'"
+        )
+
+    if "goal_minutes" not in column_names:
+        conn.execute(
+            "ALTER TABLE habits ADD COLUMN goal_minutes INTEGER DEFAULT 30"
+        )
+
+    if "color" not in column_names:
+        conn.execute(
+            "ALTER TABLE habits ADD COLUMN color TEXT DEFAULT '#2f7a57'"
+        )
+
+    conn.commit()
+    conn.close()
+
 if __name__ == "__main__":
+    update_habits_table()
     app.run(debug=True)

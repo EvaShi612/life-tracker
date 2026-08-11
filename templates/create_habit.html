@@ -19,6 +19,110 @@
 
     <br><br>
 
+
+ <!--
+Category（习惯类别）
+让用户选择这个 Habit 属于哪一种类型。
+name="category"
+之后 app.py 会使用：
+request.form.get("category")
+取得用户选择的类别，并储存到数据库。
+-->
+
+<label>Category</label><br>
+
+<select name="category">
+
+    <option value="Study">Study</option>
+    <option value="Exercise">Exercise</option>
+    <option value="Health">Health</option>
+    <option value="Personal">Personal</option>
+    <option value="Other">Other</option>
+
+</select>
+<br><br>
+
+<!--
+Frequency（完成频率）
+让用户选择多久完成一次 Habit。
+例如：
+Daily = 每天
+Weekly = 每周
+app.py 会使用：
+request.form.get("frequency")
+取得这个资料。
+-->
+
+<label>Frequency</label><br>
+
+<select name="frequency">
+
+    <option value="Daily">Daily</option>
+    <option value="Weekly">Weekly</option>
+
+</select>
+
+<br><br>
+
+
+<!--
+Goal Minutes（目标时间）
+让用户输入希望每天（或每次）
+完成这个 Habit 的目标分钟数。
+type="number"
+表示只能输入数字。
+app.py 会使用：
+request.form.get("goal_minutes")
+把这个数字存到数据库。
+-->
+
+<label>Goal Minutes</label><br>
+
+<input
+    type="number"
+    name="goal_minutes"
+    value="30"
+>
+
+<br><br>
+
+
+<!--
+Colour（颜色）
+让用户为 Habit 选择一个颜色。
+以后 Dashboard 可以根据颜色
+显示不同 Habit，让页面更容易辨认。
+app.py 会使用：
+request.form.get("color")
+取得颜色代码。
+-->
+
+<label>Colour</label><br>
+
+<input
+    type="color"
+    name="color"
+    value="#2f7a57"
+>
+
+<br><br>
+
+
+<!--
+提交按钮（Submit）
+type="submit"
+按下 Save 后，
+整个表单的数据都会送到 app.py。
+包含：
+Habit Name
+Details
+Category
+Frequency
+Goal Minutes
+Colour
+app.py 会收到这些资料，
+然后写入 SQLite 数据库。
+-->
     <button type="submit">Save</button>
 </form>
 
