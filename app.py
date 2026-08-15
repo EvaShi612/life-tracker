@@ -213,6 +213,37 @@ def edit_habit(habit_id):
 
     return render_template("edit_habit.html", habit=habit)
 
+
+# Quick Actions 页面
+# 从 actions 表读取所有预设活动，并显示在 quick_actions.html
+@app.route("/quick_actions")
+def quick_actions():
+
+    # 没有登录就不能进入
+    if "user_email" not in session:
+        return redirect(url_for("login"))
+
+    conn = sqlite3.connect("life_tracker.db")
+
+    actions = conn.execute(
+        """
+        SELECT id, name, description, icon, color,
+               benefit_1, benefit_2, benefit_3,
+               default_goal_minutes
+        FROM actions
+        ORDER BY id
+        """
+    ).fetchall()
+
+    conn.close()
+
+    return render_template(
+        "quick_actions.html",
+        actions=actions
+    )
+
+
+
 def update_habits_table():
     conn = sqlite3.connect("life_tracker.db")
 
@@ -242,6 +273,95 @@ def update_habits_table():
     conn.commit()
     conn.close()
 
+
+# 创建 actions 表
+# actions 用来保存系统预设的活动类型
+# 例如 Study Session、Exercise、Rest & Sleep、Social Time
+def create_actions_table():
+    conn = sqlite3.connect("life_tracker.db")
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS actions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE,
+            description TEXT NOT NULL,
+            icon TEXT,
+            color TEXT,
+            benefit_1 TEXT,
+            benefit_2 TEXT,
+            benefit_3 TEXT,
+            default_goal_minutes INTEGER DEFAULT 60
+        )
+    """)
+    # 检查 actions 表里面有没有默认活动
+    # 如果还是空的，就自动加入 4 个系统预设活动
+    total = conn.execute(
+        "SELECT COUNT(*) FROM actions"
+    ).fetchone()[0]
+
+    if total == 0:
+        conn.executemany(
+            """
+            INSERT INTO actions
+            (
+                name,
+                description,
+                icon,
+                color,
+                benefit_1,
+                benefit_2,
+                benefit_3,
+                default_goal_minutes
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            [
+                (
+                    "Study Session",
+                    "Focused learning and studying",
+                    "📘",
+                    "#2f7a57",
+                    "Improves knowledge",
+                    "Enhances focus",
+                    "Career growth",
+                    120
+                ),
+                (
+                    "Exercise",
+                    "Physical workout and fitness",
+                    "🏋️",
+                    "#3f8f62",
+                    "Boosts energy",
+                    "Improves health",
+                    "Better mood",
+                    60
+                ),
+                (
+                    "Rest & Sleep",
+                    "Quality rest and relaxation",
+                    "🌙",
+                    "#1f5c3f",
+                    "Restores energy",
+                    "Better focus",
+                    "Mental clarity",
+                    480
+                ),
+                (
+                    "Social Time",
+                    "Connecting with friends and family",
+                    "👥",
+                    "#6fae83",
+                    "Reduces stress",
+                    "Builds relationships",
+                    "Happiness",
+                    90
+                )
+            ]
+        )
+    conn.commit()
+    conn.close()
+
 if __name__ == "__main__":
     update_habits_table()
+    create_actions_table()
     app.run(debug=True)
