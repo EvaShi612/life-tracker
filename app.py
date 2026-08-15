@@ -393,6 +393,84 @@ def create_logs_table():
     conn.commit()
     conn.close()
 
+# Log Activity 页面
+# 用户选择一个 Activity 后，可以记录这次活动的资料
+@app.route("/log_activity/<int:action_id>", methods=["GET", "POST"])
+def log_activity(action_id):
+
+    # 没有登录就不能进入
+    if "user_email" not in session:
+        return redirect(url_for("login"))
+
+    conn = sqlite3.connect("life_tracker.db")
+
+    # 根据 action_id 找到用户选择的 Activity
+    action = conn.execute(
+        """
+        SELECT id, name, description, icon, color,
+               benefit_1, benefit_2, benefit_3,
+               default_goal_minutes
+        FROM actions
+        WHERE id = ?
+        """,
+        (action_id,)
+    ).fetchone()
+
+    # 如果找不到这个 Activity，就回到 Quick Actions
+    if not action:
+        conn.close()
+        return redirect(url_for("quick_actions"))
+
+    # 用户点击 Save Activity 后
+    if request.method == "POST":
+
+        duration_minutes = request.form.get("duration_minutes")
+        log_date = request.form.get("log_date")
+        notes = request.form.get("notes")
+        mood = request.form.get("mood")
+        productivity = request.form.get("productivity")
+        energy = request.form.get("energy")
+
+        # 把这一次 Activity 存进 logs 表
+        conn.execute(
+            """
+            INSERT INTO logs
+            (
+                user_email,
+                action_id,
+                duration_minutes,
+                log_date,
+                notes,
+                mood,
+                productivity,
+                energy
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                session["user_email"],
+                action_id,
+                duration_minutes,
+                log_date,
+                notes,
+                mood,
+                productivity,
+                energy
+            )
+        )
+
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for("quick_actions"))
+
+    conn.close()
+
+    return render_template(
+        "log_activity.html",
+        action=action
+    )
+
 if __name__ == "__main__":
     update_habits_table()
     create_actions_table()
