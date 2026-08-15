@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h1>Quick Actions</h1>
+
+<!--
+actions 是 app.py 从 actions 表查询出来的数据。
+这里使用 for loop，把每一个 activity 显示出来。
+-->
+{% for action in actions %}
+
+    <div>
+
+        <!-- action[3] = icon，action[1] = name -->
+        <h2>
+            {{ action[3] }} {{ action[1] }}
+        </h2>
+
+        <!-- action[2] = description -->
+        <p>{{ action[2] }}</p>
+
+        <!-- action[8] = default_goal_minutes -->
+        <p>
+            Goal: {{ action[8] }} minutes
+        </p>
+
+        <!-- 三个 benefits -->
+        <p>{{ action[5] }}</p>
+        <p>{{ action[6] }}</p>
+        <p>{{ action[7] }}</p>
+
+    </div>
+
+    <hr>
+
+{% endfor %}
+
+<a href="{{ url_for('dashboard') }}">
+    Back to Dashboard
+</a>
+
+{% endblock %}
