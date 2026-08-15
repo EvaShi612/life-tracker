@@ -32,7 +32,6 @@ method="POST" 表示点击 Save Changes 后，
 
     <!--
     多行文字输入框，四行高，大约40个字宽
-
     {{ habit[3] }}
         自动把数据库原本的 Details 放进去
     -->
@@ -44,6 +43,61 @@ method="POST" 表示点击 Save Changes 后，
 
     <br><br>
 
+    <!--
+Category（习惯类别）
+用户可以修改这个 Habit 属于哪一种类型。
+name="category" 会对应 app.py 里的：
+request.form.get("category")
+-->
+<label>Category</label><br>
+<select name="category">
+    <option value="Other" {% if habit[4] == "Other" %}selected{% endif %}>Other</option>
+    <option value="Study" {% if habit[4] == "Study" %}selected{% endif %}>Study</option>
+    <option value="Health" {% if habit[4] == "Health" %}selected{% endif %}>Health</option>
+    <option value="Rest" {% if habit[4] == "Rest" %}selected{% endif %}>Rest</option>
+    <option value="Social" {% if habit[4] == "Social" %}selected{% endif %}>Social</option>
+</select>
+
+<br><br>
+
+<!--
+Frequency（完成频率）
+用户可以修改这个 Habit 是每天完成还是每周完成。
+-->
+<label>Frequency</label><br>
+<select name="frequency">
+    <option value="Daily" {% if habit[5] == "Daily" %}selected{% endif %}>Daily</option>
+    <option value="Weekly" {% if habit[5] == "Weekly" %}selected{% endif %}>Weekly</option>
+</select>
+
+<br><br>
+
+<!--
+Goal Minutes（目标时间）
+修改这个 Habit 的目标分钟数。
+-->
+<label>Goal Minutes</label><br>
+<input
+    type="number"
+    name="goal_minutes"
+    value="{{ habit[6] }}"
+    min="1"
+>
+
+<br><br>
+
+<!--
+Colour（颜色）
+修改 Habit 的颜色。
+-->
+<label>Colour</label><br>
+<input
+    type="color"
+    name="color"
+    value="{{ habit[7] }}"
+>
+
+<br><br>
     <button type="submit">Save Changes</button>
 
 </form>

@@ -76,7 +76,7 @@ def dashboard():
 
     habits = conn.execute(
     """
-    SELECT id, habit_name, details
+    SELECT id, habit_name, details, category, frequency, goal_minutes, color
     FROM habits
     WHERE user_email = ?
     """,
@@ -108,15 +108,29 @@ def create_habit():
     if request.method == "POST":
         habit_name = request.form.get("habit_name")
         details = request.form.get("details")
+        category = request.form.get("category", "Other")
+        frequency = request.form.get("frequency", "Daily")
+        goal_minutes = request.form.get("goal_minutes", 30)
+        color = request.form.get("color", "#2f7a57")
 
         conn = sqlite3.connect("life_tracker.db")
         conn.execute(
-            """
-            INSERT INTO habits (user_email, habit_name, details)
-            VALUES (?, ?, ?)
-            """,
-            (session["user_email"], habit_name, details)
-        )
+    """
+    INSERT INTO habits
+    (user_email, habit_name, details, category, frequency, goal_minutes, color)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    """,
+    (
+        session["user_email"],
+        habit_name,
+        details,
+        category,
+        frequency,
+        goal_minutes,
+        color
+    )
+)
+            
         conn.commit()
         conn.close()
 
@@ -133,9 +147,13 @@ def delete_habit(habit_id):
     
     conn = sqlite3.connect("life_tracker.db")
 
+# 只删除属于当前登录用户的 Habit
     conn.execute(
-        "DELETE FROM habits WHERE id = ?",
-        (habit_id,)
+        """
+        DELETE FROM habits
+        WHERE id = ? AND user_email = ?
+        """,
+        (habit_id, session["user_email"])
     )
     conn.commit()
     conn.close()
@@ -151,17 +169,35 @@ def edit_habit(habit_id):
         return redirect(url_for("login"))
     
     conn = sqlite3.connect("life_tracker.db")
+
+    # 如果用户提交修改后的 Habit。从 edit_habit.html 获取新的资料。然后 UPDATE 数据库里对应的 Habit
     if request.method == "POST":
         habit_name = request.form.get("habit_name")
         details = request.form.get("details")
+        category = request.form.get("category", "Other")
+        frequency = request.form.get("frequency", "Daily")
+        goal_minutes = request.form.get("goal_minutes", 30)
+        color = request.form.get("color", "#071a11")
+        
+# 根据 habit_id 找到原来的 Habit，并更新所有资料
         conn.execute(
             """
             UPDATE habits
-            SET habit_name = ?, details = ?
-            WHERE id = ?
+            SET habit_name = ?, details = ?, category = ?, frequency = ?, goal_minutes = ?, color = ?
+            WHERE id = ? AND user_email = ?
             """,
-            (habit_name, details, habit_id)
+            ( 
+                habit_name,
+                details,
+                category,
+                frequency,
+                goal_minutes,
+                color,
+                habit_id,
+                session["user_email"]
+            )
         )
+
         conn.commit()
         conn.close()
         return redirect(url_for("dashboard"))
@@ -169,9 +205,9 @@ def edit_habit(habit_id):
         """
         SELECT *
         FROM habits
-        WHERE id = ?
+        WHERE id = ? AND user_email = ?
         """,
-        (habit_id,)
+        (habit_id,session["user_email"])
     ).fetchone()
     conn.close()
 
