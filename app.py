@@ -361,7 +361,40 @@ def create_actions_table():
     conn.commit()
     conn.close()
 
+
+# 创建 logs 表
+# 用来记录用户每一次完成的 Activity
+def create_logs_table():
+    conn = sqlite3.connect("life_tracker.db")
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            user_email TEXT NOT NULL,
+            action_id INTEGER NOT NULL,
+
+            duration_minutes INTEGER NOT NULL,
+            log_date TEXT NOT NULL,
+
+            notes TEXT,
+            mood TEXT,
+            productivity INTEGER,
+            energy INTEGER,
+
+            FOREIGN KEY (user_email)
+                REFERENCES users(email),
+
+            FOREIGN KEY (action_id)
+                REFERENCES actions(id)
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
 if __name__ == "__main__":
     update_habits_table()
     create_actions_table()
+    create_logs_table()
     app.run(debug=True)
