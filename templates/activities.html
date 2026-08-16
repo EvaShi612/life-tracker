@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h1>Activities</h1>
+
+<!--
+actions 是 app.py 从 actions 表查询出来的所有 Activity。
+使用 for loop 把每一个 Activity 显示出来。
+-->
+{% for action in actions %}
+
+    <div>
+
+        <!--
+        action[3] = icon
+        action[1] = name
+        -->
+        <h2>
+            {{ action[3] }} {{ action[1] }}
+        </h2>
+
+        <!-- action[2] = description -->
+        <p>{{ action[2] }}</p>
+
+        <!-- 默认建议时间 -->
+        <p>
+            Recommended time: {{ action[8] }} minutes
+        </p>
+
+        <!-- Activity 的三个 benefits -->
+        <p>Benefits:</p>
+
+        <ul>
+            <li>{{ action[5] }}</li>
+            <li>{{ action[6] }}</li>
+            <li>{{ action[7] }}</li>
+        </ul>
+
+        <!-- 可以直接记录这个 Activity -->
+        <a href="{{ url_for('log_activity', action_id=action[0]) }}">
+            Log Activity
+        </a>
+
+    </div>
+
+    <hr>
+
+{% endfor %}
+
+<a href="{{ url_for('dashboard') }}">
+    Back to Dashboard
+</a>
+{% endblock %}

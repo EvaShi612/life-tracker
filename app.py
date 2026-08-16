@@ -471,6 +471,35 @@ def log_activity(action_id):
         action=action
     )
 
+
+# Activities 页面
+# 从 actions 表读取所有 Activity，然后显示在 activities.html
+@app.route("/activities")
+def activities():
+
+    # 没有登录就不能进入
+    if "user_email" not in session:
+        return redirect(url_for("login"))
+
+    conn = sqlite3.connect("life_tracker.db")
+
+    actions = conn.execute(
+        """
+        SELECT id, name, description, icon, color,
+               benefit_1, benefit_2, benefit_3,
+               default_goal_minutes
+        FROM actions
+        ORDER BY id
+        """
+    ).fetchall()
+
+    conn.close()
+
+    return render_template(
+        "activities.html",
+        actions=actions
+    )
+
 if __name__ == "__main__":
     update_habits_table()
     create_actions_table()
