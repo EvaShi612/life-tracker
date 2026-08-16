@@ -500,6 +500,42 @@ def activities():
         actions=actions
     )
 
+
+
+# Activity Detail 页面
+# 根据 action_id 显示某一个 Activity 的详细资料
+@app.route("/activity/<int:action_id>")
+def activity_detail(action_id):
+
+    # 没有登录就不能进入
+    if "user_email" not in session:
+        return redirect(url_for("login"))
+
+    conn = sqlite3.connect("life_tracker.db")
+
+    # 找到用户点击的 Activity
+    action = conn.execute(
+        """
+        SELECT id, name, description, icon, color,
+               benefit_1, benefit_2, benefit_3,
+               default_goal_minutes
+        FROM actions
+        WHERE id = ?
+        """,
+        (action_id,)
+    ).fetchone()
+
+    conn.close()
+
+    # 如果这个 Activity 不存在，就回到 Activities
+    if not action:
+        return redirect(url_for("activities"))
+
+    return render_template(
+        "activity_detail.html",
+        action=action
+    )
+
 if __name__ == "__main__":
     update_habits_table()
     create_actions_table()

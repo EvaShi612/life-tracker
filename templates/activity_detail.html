@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<!--
+Activity Detail 页面
+
+action[0] = id
+action[1] = name
+action[2] = description
+action[3] = icon
+action[4] = color
+action[5] = benefit_1
+action[6] = benefit_2
+action[7] = benefit_3
+action[8] = default_goal_minutes
+-->
+
+<h1>
+    {{ action[3] }} {{ action[1] }}
+</h1>
+
+<p>
+    {{ action[2] }}
+</p>
+
+<h3>Recommended Time</h3>
+
+<p>
+    {{ action[8] }} minutes
+</p>
+
+
+<h3>Benefits</h3>
+
+<ul>
+    <li>{{ action[5] }}</li>
+    <li>{{ action[6] }}</li>
+    <li>{{ action[7] }}</li>
+</ul>
+
+
+<!--
+进入 Log Activity 页面，
+并把当前 Activity 的 id 传给 app.py
+-->
+<a href="{{ url_for('log_activity', action_id=action[0]) }}">
+    Log Activity
+</a>
+
+<br><br>
+
+<a href="{{ url_for('activities') }}">
+    Back to Activities
+</a>
+
+{% endblock %}
