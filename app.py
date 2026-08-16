@@ -536,6 +536,51 @@ def activity_detail(action_id):
         action=action
     )
 
+
+
+# History 页面
+# 显示当前登录用户以前记录过的所有 Activities
+@app.route("/history")
+def history():
+
+    # 没有登录就不能进入
+    if "user_email" not in session:
+        return redirect(url_for("login"))
+
+    conn = sqlite3.connect("life_tracker.db")
+
+    # logs 保存用户的记录
+    # actions 保存 Activity 的名字、icon 和颜色
+    # JOIN 可以根据 action_id 把两个表连接起来
+    logs = conn.execute(
+        """
+        SELECT
+            logs.id,
+            actions.name,
+            actions.icon,
+            actions.color,
+            logs.duration_minutes,
+            logs.log_date,
+            logs.notes,
+            logs.mood,
+            logs.productivity,
+            logs.energy
+        FROM logs
+        JOIN actions
+            ON logs.action_id = actions.id
+        WHERE logs.user_email = ?
+        ORDER BY logs.log_date DESC, logs.id DESC
+        """,
+        (session["user_email"],)
+    ).fetchall()
+
+    conn.close()
+
+    return render_template(
+        "history.html",
+        logs=logs
+    )
+
 if __name__ == "__main__":
     update_habits_table()
     create_actions_table()

@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h1>Activity History</h1>
+
+<!--
+logs 是 app.py 查询出来的当前用户所有 Activity records
+-->
+
+{% if logs %}
+
+    {% for log in logs %}
+
+        <div>
+
+            <!--
+            log[1] = Activity name
+            log[2] = icon
+            -->
+            <h2>
+                {{ log[2] }} {{ log[1] }}
+            </h2>
+
+            <!-- log[5] = date -->
+            <p>
+                Date: {{ log[5] }}
+            </p>
+
+            <!-- log[4] = duration -->
+            <p>
+                Duration: {{ log[4] }} minutes
+            </p>
+
+            <!-- log[7] = mood -->
+            <p>
+                Mood: {{ log[7] }}
+            </p>
+
+            <!-- log[8] = productivity -->
+            <p>
+                Productivity: {{ log[8] }}/5
+            </p>
+
+            <!-- log[9] = energy -->
+            <p>
+                Energy: {{ log[9] }}/5
+            </p>
+
+            <!-- 只有写了 notes 才显示 -->
+            {% if log[6] %}
+                <p>
+                    Notes: {{ log[6] }}
+                </p>
+            {% endif %}
+
+        </div>
+
+        <hr>
+
+    {% endfor %}
+
+{% else %}
+
+    <!-- 用户还没有记录任何 Activity -->
+    <p>You have not logged any activities yet.</p>
+
+{% endif %}
+
+
+<a href="{{ url_for('dashboard') }}">
+    Back to Dashboard
+</a>
+
+{% endblock %}
