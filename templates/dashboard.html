@@ -4,6 +4,19 @@
 
 <h1>Dashboard</h1>
 
+<!-- 页面导航 -->
+<nav>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    |
+    <a href="{{ url_for('quick_actions') }}">Quick Actions</a>
+    |
+    <a href="{{ url_for('activities') }}">Activities</a>
+    |
+    <a href="{{ url_for('history') }}">History</a>
+</nav>
+
+<br>
+
 <!-- 显示现在登录的用户 -->
 <p>Logged in as: {{ email }}</p>
 
