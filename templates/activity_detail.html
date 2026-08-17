@@ -40,6 +40,13 @@ action[8] = default_goal_minutes
 </ul>
 
 
+<!-- 开始真正的 Activity Timer -->
+<a href="{{ url_for('activity_timer', action_id=action[0]) }}">
+    Start Timer
+</a>
+
+<br><br>
+
 <!--
 进入 Log Activity 页面，
 并把当前 Activity 的 id 传给 app.py

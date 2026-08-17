@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h1>Activity Timer</h1>
+
+<!--
+action 是 app.py 根据 action_id 查询出来的 Activity。
+
+action[0] = id
+action[1] = name
+action[2] = description
+action[3] = icon
+-->
+
+<h2>
+    {{ action[3] }} {{ action[1] }}
+</h2>
+
+<p>{{ action[2] }}</p>
+
+
+<!--
+Timer 显示区域
+
+初始时间是：
+00 : 00 : 00
+-->
+<h1 id="timer">
+    00:00:00
+</h1>
+
+
+<!-- 开始计时 -->
+<button onclick="startTimer()">
+    Start
+</button>
+
+<!-- 暂停计时 -->
+<button onclick="pauseTimer()">
+    Pause
+</button>
+
+<!-- 重置回 00:00:00 -->
+<button onclick="resetTimer()">
+    Reset
+</button>
+
+
+<br><br>
+
+<a href="{{ url_for('activity_detail', action_id=action[0]) }}">
+    Back to Activity
+</a>
+
+
+<script>
+
+    // seconds 用来记录总共经过了多少秒
+    let seconds = 0
+
+    // timerInterval 用来保存计时器
+    let timerInterval = null
+
+
+    // 开始计时
+    function startTimer() {
+
+        // 如果 Timer 已经在运行，就不要再开第二个
+        if (timerInterval !== null) {
+            return
+        }
+
+        // 每 1000 milliseconds（1 秒）执行一次
+        timerInterval = setInterval(function() {
+
+            seconds = seconds + 1
+
+            updateTimerDisplay()
+
+        }, 1000)
+    }
+
+
+    // 暂停 Timer
+    function pauseTimer() {
+
+        clearInterval(timerInterval)
+
+        timerInterval = null
+    }
+
+
+    // 重置 Timer
+    function resetTimer() {
+
+        clearInterval(timerInterval)
+
+        timerInterval = null
+
+        seconds = 0
+
+        updateTimerDisplay()
+    }
+
+
+    // 把总秒数转换成 hours : minutes : seconds
+    function updateTimerDisplay() {
+
+        let hours = Math.floor(seconds / 3600)
+
+        let minutes = Math.floor((seconds % 3600) / 60)
+
+        let remainingSeconds = seconds % 60
+
+
+        // padStart(2, "0")
+        // 例如 5 会显示成 05
+        hours = String(hours).padStart(2, "0")
+
+        minutes = String(minutes).padStart(2, "0")
+
+        remainingSeconds = String(remainingSeconds).padStart(2, "0")
+
+
+        // 更新网页上的 Timer
+        document.getElementById("timer").innerText =
+            hours + ":" + minutes + ":" + remainingSeconds
+    }
+
+</script>
+
+{% endblock %}

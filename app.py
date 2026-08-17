@@ -537,6 +537,39 @@ def activity_detail(action_id):
     )
 
 
+# Activity Timer 页面
+# 用户可以选择一个 Activity 后开始计时
+@app.route("/timer/<int:action_id>")
+def activity_timer(action_id):
+
+    # 没有登录就不能进入 Timer
+    if "user_email" not in session:
+        return redirect(url_for("login"))
+
+    conn = sqlite3.connect("life_tracker.db")
+
+    # 根据 action_id 找到用户选择的 Activity
+    action = conn.execute(
+        """
+        SELECT id, name, description, icon, color,
+               benefit_1, benefit_2, benefit_3,
+               default_goal_minutes
+        FROM actions
+        WHERE id = ?
+        """,
+        (action_id,)
+    ).fetchone()
+
+    conn.close()
+
+    # 如果 Activity 不存在，就回到 Activities
+    if not action:
+        return redirect(url_for("activities"))
+
+    return render_template(
+        "timer.html",
+        action=action
+    )
 
 # History 页面
 # 显示当前登录用户以前记录过的所有 Activities
