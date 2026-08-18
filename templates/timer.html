@@ -47,6 +47,16 @@ Timer 显示区域
 </button>
 
 
+
+<!--
+Finish：
+结束计时，并把实际计时时长传到 Log Activity 页面。
+-->
+<button onclick="finishTimer()">
+    Finish
+</button>
+
+
 <br><br>
 
 <a href="{{ url_for('activity_detail', action_id=action[0]) }}">
@@ -102,6 +112,26 @@ Timer 显示区域
 
         updateTimerDisplay()
     }
+
+
+    // 完成这次 Activity
+    function finishTimer() {
+
+    // 先暂停 Timer
+        clearInterval(timerInterval)
+        timerInterval = null
+
+    // 把秒数转换成分钟
+    // Math.ceil 表示不足 1 分钟也算 1 分钟
+        let minutes = Math.max(1, Math.ceil(seconds / 60))
+
+    // 跳到 Log Activity 页面
+    // 同时把 Timer 算出来的分钟数放进网址
+         window.location.href =
+            "{{ url_for('log_activity', action_id=action[0]) }}"
+            + "?duration="
+            + minutes
+}
 
 
     // 把总秒数转换成 hours : minutes : seconds

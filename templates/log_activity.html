@@ -23,12 +23,15 @@ action[8] = default_goal_minutes
 
 <form method="POST">
 
-    <!-- 记录这次 Activity 做了多少分钟 -->
+    <!-- 记录这次 Activity 做了多少分钟 
+    value：
+    如果是 Timer 过来的 → 显示真实计时时长。
+    如果用户直接点 Manual Log → 继续显示系统默认时间。-->
     <label>Duration (minutes)</label><br>
     <input
         type="number"
         name="duration_minutes"
-        value="{{ action[8] }}"
+        value="{{ timer_duration if timer_duration else action[8] }}"
         min="1"
         required
     >

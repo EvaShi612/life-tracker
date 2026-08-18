@@ -464,11 +464,15 @@ def log_activity(action_id):
 
         return redirect(url_for("quick_actions"))
 
+# 如果用户是从 Timer 页面来的，
+# duration 会通过网址传过来
+    timer_duration = request.args.get("duration")
     conn.close()
 
     return render_template(
         "log_activity.html",
-        action=action
+        action=action,
+        timer_duration=timer_duration
     )
 
 
