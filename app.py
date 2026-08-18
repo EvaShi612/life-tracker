@@ -247,155 +247,6 @@ def quick_actions():
 
 
 
-def update_habits_table():
-    conn = sqlite3.connect("life_tracker.db")
-
-    columns = conn.execute("PRAGMA table_info(habits)").fetchall()
-    column_names = [column[1] for column in columns]
-
-    if "category" not in column_names:
-        conn.execute(
-            "ALTER TABLE habits ADD COLUMN category TEXT DEFAULT 'Other'"
-        )
-
-    if "frequency" not in column_names:
-        conn.execute(
-            "ALTER TABLE habits ADD COLUMN frequency TEXT DEFAULT 'Daily'"
-        )
-
-    if "goal_minutes" not in column_names:
-        conn.execute(
-            "ALTER TABLE habits ADD COLUMN goal_minutes INTEGER DEFAULT 30"
-        )
-
-    if "color" not in column_names:
-        conn.execute(
-            "ALTER TABLE habits ADD COLUMN color TEXT DEFAULT '#2f7a57'"
-        )
-
-    conn.commit()
-    conn.close()
-
-
-# 创建 actions 表
-# actions 用来保存系统预设的活动类型
-# 例如 Study Session、Exercise、Rest & Sleep、Social Time
-def create_actions_table():
-    conn = sqlite3.connect("life_tracker.db")
-
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS actions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE,
-            description TEXT NOT NULL,
-            icon TEXT,
-            color TEXT,
-            benefit_1 TEXT,
-            benefit_2 TEXT,
-            benefit_3 TEXT,
-            default_goal_minutes INTEGER DEFAULT 60
-        )
-    """)
-    # 检查 actions 表里面有没有默认活动
-    # 如果还是空的，就自动加入 4 个系统预设活动
-    total = conn.execute(
-        "SELECT COUNT(*) FROM actions"
-    ).fetchone()[0]
-
-    if total == 0:
-        conn.executemany(
-            """
-            INSERT INTO actions
-            (
-                name,
-                description,
-                icon,
-                color,
-                benefit_1,
-                benefit_2,
-                benefit_3,
-                default_goal_minutes
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            [
-                (
-                    "Study Session",
-                    "Focused learning and studying",
-                    "📘",
-                    "#2f7a57",
-                    "Improves knowledge",
-                    "Enhances focus",
-                    "Career growth",
-                    120
-                ),
-                (
-                    "Exercise",
-                    "Physical workout and fitness",
-                    "🏋️",
-                    "#3f8f62",
-                    "Boosts energy",
-                    "Improves health",
-                    "Better mood",
-                    60
-                ),
-                (
-                    "Rest & Sleep",
-                    "Quality rest and relaxation",
-                    "🌙",
-                    "#1f5c3f",
-                    "Restores energy",
-                    "Better focus",
-                    "Mental clarity",
-                    480
-                ),
-                (
-                    "Social Time",
-                    "Connecting with friends and family",
-                    "👥",
-                    "#6fae83",
-                    "Reduces stress",
-                    "Builds relationships",
-                    "Happiness",
-                    90
-                )
-            ]
-        )
-    conn.commit()
-    conn.close()
-
-
-# 创建 logs 表
-# 用来记录用户每一次完成的 Activity
-def create_logs_table():
-    conn = sqlite3.connect("life_tracker.db")
-
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-            user_email TEXT NOT NULL,
-            action_id INTEGER NOT NULL,
-
-            duration_minutes INTEGER NOT NULL,
-            log_date TEXT NOT NULL,
-
-            notes TEXT,
-            mood TEXT,
-            productivity INTEGER,
-            energy INTEGER,
-
-            FOREIGN KEY (user_email)
-                REFERENCES users(email),
-
-            FOREIGN KEY (action_id)
-                REFERENCES actions(id)
-        )
-    """)
-
-    conn.commit()
-    conn.close()
-
 # Log Activity 页面
 # 用户选择一个 Activity 后，可以记录这次活动的资料
 @app.route("/log_activity/<int:action_id>", methods=["GET", "POST"])
@@ -471,6 +322,10 @@ def log_activity(action_id):
 # 如果用户是从 Timer 页面来的，
 # duration 会通过网址传过来
     timer_duration = request.args.get("duration")
+# 自动取得今天的日期
+# isoformat() 会变成 HTML date input 可以使用的格式
+# 例如 2026-08-19
+    today = date.today().isoformat()
     conn.close()
 
     return render_template(
@@ -480,10 +335,7 @@ def log_activity(action_id):
         today=today
 )
 
-# 自动取得今天的日期
-# isoformat() 会变成 HTML date input 可以使用的格式：
-# 例如 2026-08-18
-today = date.today().isoformat()
+
 
 # Activities 页面
 # 从 actions 表读取所有 Activity，然后显示在 activities.html
@@ -584,6 +436,7 @@ def activity_timer(action_id):
         action=action
     )
 
+
 # History 页面
 # 显示当前登录用户以前记录过的所有 Activities
 @app.route("/history")
@@ -628,7 +481,4 @@ def history():
     )
 
 if __name__ == "__main__":
-    update_habits_table()
-    create_actions_table()
-    create_logs_table()
     app.run(debug=True)
