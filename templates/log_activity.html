@@ -38,13 +38,22 @@ action[8] = default_goal_minutes
 
     <br><br>
 
-    <!-- 记录 Activity 完成日期 -->
-    <label>Date</label><br>
+    <!--
+    Date（日期）
+
+    today 是 app.py 自动取得的今天日期。
+    这样用户打开 Log Activity 时，
+    不需要自己每次重新选择今天。
+    -->
+        <label>Date</label><br>
+
     <input
         type="date"
         name="log_date"
+        value="{{ today }}"
         required
     >
+    
 
     <br><br>
 

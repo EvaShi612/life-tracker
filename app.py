@@ -1,5 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash,check_password_hash
+# date 用来自动取得今天的日期
+from datetime import date
+
 #Flask：创建网站
 #render_template：打开HTML页面
 #request：获取用户提交的数据
@@ -462,7 +465,8 @@ def log_activity(action_id):
         conn.commit()
         conn.close()
 
-        return redirect(url_for("quick_actions"))
+        # 保存完成后直接回到 Dashboard
+        return redirect(url_for("dashboard"))
 
 # 如果用户是从 Timer 页面来的，
 # duration 会通过网址传过来
@@ -472,9 +476,14 @@ def log_activity(action_id):
     return render_template(
         "log_activity.html",
         action=action,
-        timer_duration=timer_duration
-    )
+        timer_duration=timer_duration,
+        today=today
+)
 
+# 自动取得今天的日期
+# isoformat() 会变成 HTML date input 可以使用的格式：
+# 例如 2026-08-18
+today = date.today().isoformat()
 
 # Activities 页面
 # 从 actions 表读取所有 Activity，然后显示在 activities.html
