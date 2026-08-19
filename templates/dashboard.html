@@ -20,10 +20,38 @@
 <!-- 显示现在登录的用户 -->
 <p>Logged in as: {{ email }}</p>
 
+
+<!-- =========================
+     Dashboard Statistics
+     显示今天的活动统计
+========================= -->
+
+<h2>Today's Progress</h2>
+
+<p>
+    Today's Minutes: {{ today_minutes }}
+</p>
+
+<p>
+    Today's Sessions: {{ today_sessions }}
+</p>
+
+<p>
+    Total Habits: {{ total_habits }}
+</p>
+
+<hr>
+
+
 <!-- 创建新 Habit 的按钮 -->
 <a href="{{ url_for('create_habit') }}">Create Habit</a>
 
 <hr>
+
+
+<!-- =========================
+     Habit List
+========================= -->
 
 <!-- 如果用户已经创建了 Habit -->
 {% if habits %}
@@ -34,7 +62,8 @@
         <div>
 
             <!--
-            app.py 查询 Habit 的顺序是：
+            app.py 查询 Habit 的顺序：
+
             habit[0] = id
             habit[1] = habit_name
             habit[2] = details
@@ -46,7 +75,8 @@
 
             <!--
             显示用户选择的 Habit 颜色。
-            background-color 使用数据库里保存的 color。
+
+            background-color 会使用数据库中保存的 color。
             -->
             <span
                 style="
@@ -59,44 +89,55 @@
                 "
             ></span>
 
+
             <!-- Habit 名称 -->
             <h3 style="display: inline-block;">
                 {{ habit[1] }}
             </h3>
+
 
             <!-- Habit 类别和完成频率 -->
             <p>
                 {{ habit[3] }} • {{ habit[4] }}
             </p>
 
+
             <!--
             Habit Details
-            只有用户填写了 Details 才显示这一段。
+
+            只有用户填写了 details，
+            才显示这一段。
             -->
             {% if habit[2] %}
-                <p>{{ habit[2] }}</p>
+
+                <p>
+                    {{ habit[2] }}
+                </p>
+
             {% endif %}
+
 
             <!-- Habit 的目标完成时间 -->
             <p>
                 Goal: {{ habit[5] }} minutes
             </p>
 
+
             <!--
             Edit 按钮
 
             habit[0] 是 Habit 的 id。
-            例如 id 是 3，就会打开 /edit/3。
+            url_for 会根据 edit_habit() 自动生成网址。
             -->
             <a href="{{ url_for('edit_habit', habit_id=habit[0]) }}">
                 Edit
             </a>
 
+
             <!--
             Delete 按钮
 
             habit[0] 是 Habit 的 id。
-            例如 id 是 3，就会打开 /delete/3。
             -->
             <a href="{{ url_for('delete_habit', habit_id=habit[0]) }}">
                 Delete
@@ -108,16 +149,20 @@
 
     {% endfor %}
 
-<!-- 如果用户还没有创建任何 Habit -->
+
+<!-- 如果这个用户还没有创建 Habit -->
 {% else %}
 
     <p>You do not have any habits yet.</p>
 
 {% endif %}
 
+
 <br>
 
-<!-- 清除 Session 并退出登录 -->
-<a href="{{ url_for('logout') }}">Logout</a>
+<!-- 登出 -->
+<a href="{{ url_for('logout') }}">
+    Logout
+</a>
 
 {% endblock %}
