@@ -189,7 +189,7 @@ def dashboard():
 
 
     # -----------------------------------------------------
-    # 查询最近一条 Activity 记录
+    # 查询最近一条 Activity
     # -----------------------------------------------------
 
     recent_activity = conn.execute(
@@ -212,10 +212,71 @@ def dashboard():
     ).fetchone()
 
 
+    # -----------------------------------------------------
+    # 查询总 Active Days
+    # 同一天有多个 Activity 也只算一天
+    # -----------------------------------------------------
+
+    active_days = conn.execute(
+        """
+        SELECT COUNT(DISTINCT log_date)
+        FROM logs
+        WHERE user_email = ?
+        """,
+        (email,)
+    ).fetchone()[0]
+
+
+    # -----------------------------------------------------
+    # 取得所有有 Activity 的日期
+    # 用来计算连续活跃天数 Streak
+    # -----------------------------------------------------
+
+    active_dates = conn.execute(
+        """
+        SELECT DISTINCT log_date
+        FROM logs
+        WHERE user_email = ?
+        ORDER BY log_date DESC
+        """,
+        (email,)
+    ).fetchall()
+
+    # 把 [('2026-08-20',), ('2026-08-19',)]
+    # 转换成 ['2026-08-20', '2026-08-19']
+    active_dates = [row[0] for row in active_dates]
+
+
+    # -----------------------------------------------------
+    # 计算 Streak
+    # 从今天开始往前检查连续有 Activity 的日期
+    # -----------------------------------------------------
+
+    streak = 0
+    current_date = date.today()
+
+    for active_date in active_dates:
+
+        if active_date == current_date.isoformat():
+
+            streak += 1
+
+            current_date = current_date.fromordinal(
+                current_date.toordinal() - 1
+            )
+
+        elif active_date < current_date.isoformat():
+
+            break
+
+
     conn.close()
 
 
+    # -----------------------------------------------------
     # 把所有 Dashboard 数据传给 dashboard.html
+    # -----------------------------------------------------
+
     return render_template(
         "dashboard.html",
         email=email,
@@ -223,8 +284,11 @@ def dashboard():
         today_minutes=today_minutes,
         today_sessions=today_sessions,
         total_habits=total_habits,
-        recent_activity=recent_activity
+        recent_activity=recent_activity,
+        active_days=active_days,
+        streak=streak
     )
+
 
 
 # =========================================================
