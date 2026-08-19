@@ -43,6 +43,48 @@
 <hr>
 
 
+<!--
+Recent Activity
+显示用户最近完成的一次 Activity
+-->
+<h2>Recent Activity</h2>
+
+{% if recent_activity %}
+
+    <p>
+        {{ recent_activity[1] }}
+        {{ recent_activity[0] }}
+    </p>
+
+    <p>
+        {{ recent_activity[2] }} minutes
+    </p>
+
+    <p>
+        Date: {{ recent_activity[3] }}
+    </p>
+
+    {% if recent_activity[4] %}
+        <p>
+            Mood: {{ recent_activity[4] }}
+        </p>
+    {% endif %}
+
+    {% if recent_activity[5] %}
+        <p>
+            Productivity: {{ recent_activity[5] }}/5
+        </p>
+    {% endif %}
+
+{% else %}
+
+    <p>No activity recorded yet.</p>
+
+{% endif %}
+
+<hr>
+
+
 <!-- 创建新 Habit 的按钮 -->
 <a href="{{ url_for('create_habit') }}">Create Habit</a>
 

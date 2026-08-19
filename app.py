@@ -188,6 +188,30 @@ def dashboard():
     ).fetchone()[0]
 
 
+    # -----------------------------------------------------
+    # 查询最近一条 Activity 记录
+    # -----------------------------------------------------
+
+    recent_activity = conn.execute(
+        """
+        SELECT
+            actions.name,
+            actions.icon,
+            logs.duration_minutes,
+            logs.log_date,
+            logs.mood,
+            logs.productivity
+        FROM logs
+        JOIN actions
+            ON logs.action_id = actions.id
+        WHERE logs.user_email = ?
+        ORDER BY logs.log_date DESC, logs.id DESC
+        LIMIT 1
+        """,
+        (email,)
+    ).fetchone()
+
+
     conn.close()
 
 
@@ -198,7 +222,8 @@ def dashboard():
         habits=habits,
         today_minutes=today_minutes,
         today_sessions=today_sessions,
-        total_habits=total_habits
+        total_habits=total_habits,
+        recent_activity=recent_activity
     )
 
 
