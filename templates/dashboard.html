@@ -172,15 +172,24 @@ Recent Activity
             </p>
 
             <!--
-            如果这个 Habit 已经关联 Activity，
-            就显示 Start 按钮。habit[7] = action_id    -->
+            habit[7] = action_id
+            habit[0] = habit_id
+
+            action_id 告诉 Timer：要进行哪种 Activity
+            habit_id 告诉 Timer：是从哪个 Habit 开始的
+            -->
             {% if habit[7] %}
 
-                <a href="{{ url_for('activity_timer', action_id=habit[7]) }}">
-                Start
+                <a href="{{ url_for(
+                    'activity_timer',
+                    action_id=habit[7],
+                    habit_id=habit[0]
+                ) }}">
+                    Start
                 </a>
 
                 <br><br>
+
             {% endif %}
 
 
