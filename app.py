@@ -315,6 +315,27 @@ def create_habit():
     if "user_email" not in session:
         return redirect(url_for("login"))
 
+    conn = sqlite3.connect("life_tracker.db")
+
+
+    # -----------------------------------------------------
+    # 读取所有 Activity
+    # 让用户创建 Habit 时可以选择关联的 Activity
+    # -----------------------------------------------------
+
+    actions = conn.execute(
+        """
+        SELECT id, name
+        FROM actions
+        ORDER BY id
+        """
+    ).fetchall()
+
+
+    # -----------------------------------------------------
+    # POST：保存新 Habit
+    # -----------------------------------------------------
+
     if request.method == "POST":
 
         habit_name = request.form.get("habit_name")
@@ -324,7 +345,13 @@ def create_habit():
         goal_minutes = request.form.get("goal_minutes", 30)
         color = request.form.get("color", "#2f7a57")
 
-        conn = sqlite3.connect("life_tracker.db")
+        # 取得用户选择的 Linked Activity
+        action_id = request.form.get("action_id")
+
+        # 如果用户没有选择 Activity，
+        # 就存成 None
+        if action_id == "":
+            action_id = None
 
         conn.execute(
             """
@@ -336,9 +363,10 @@ def create_habit():
                 category,
                 frequency,
                 goal_minutes,
-                color
+                color,
+                action_id
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 session["user_email"],
@@ -347,7 +375,8 @@ def create_habit():
                 category,
                 frequency,
                 goal_minutes,
-                color
+                color,
+                action_id
             )
         )
 
@@ -356,7 +385,18 @@ def create_habit():
 
         return redirect(url_for("dashboard"))
 
-    return render_template("create_habit.html")
+
+    # -----------------------------------------------------
+    # GET：打开 Create Habit 页面
+    # -----------------------------------------------------
+
+    conn.close()
+
+    return render_template(
+        "create_habit.html",
+        actions=actions
+    )
+
 
 
 # =========================================================

@@ -64,6 +64,30 @@ request.form.get("frequency")
 
 <br><br>
 
+<!--
+Linked Activity
+把这个 Habit 和一个 Activity 类型连接起来。
+以后可以直接从 Habit 开始 Timer。
+-->
+<label>Linked Activity</label><br>
+
+<select name="action_id">
+
+    <option value="">
+        No linked activity
+    </option>
+
+    {% for action in actions %}
+
+        <option value="{{ action[0] }}">
+            {{ action[1] }}
+        </option>
+
+    {% endfor %}
+
+</select>
+
+<br><br>
 
 <!--
 Goal Minutes（目标时间）
