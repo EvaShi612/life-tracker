@@ -171,6 +171,18 @@ Recent Activity
                 Goal: {{ habit[5] }} minutes
             </p>
 
+            <!--
+            如果这个 Habit 已经关联 Activity，
+            就显示 Start 按钮。habit[7] = action_id    -->
+            {% if habit[7] %}
+
+                <a href="{{ url_for('activity_timer', action_id=habit[7]) }}">
+                Start
+                </a>
+
+                <br><br>
+            {% endif %}
+
 
             <!--
             Edit 按钮

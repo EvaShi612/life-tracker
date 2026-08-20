@@ -116,9 +116,9 @@ def dashboard():
 
     conn = sqlite3.connect("life_tracker.db")
 
-
     # -----------------------------------------------------
     # 查询当前用户所有 Habit
+    # action_id 用来连接 Habit 和 Activity Timer
     # -----------------------------------------------------
 
     habits = conn.execute(
@@ -130,13 +130,14 @@ def dashboard():
             category,
             frequency,
             goal_minutes,
-            color
+            color,
+            action_id
         FROM habits
         WHERE user_email = ?
         """,
         (email,)
     ).fetchall()
-
+    
 
     # -----------------------------------------------------
     # 查询今天总共记录了多少分钟
