@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class="home-page">
+
+    <!-- 网站主要介绍 -->
+    <div class="home-intro">
+
+        <h1>Life Tracker</h1>
+
+        <h2>
+            Build better habits and track your progress.
+        </h2>
+
+        <p>
+            Organise your habits, track activities,
+            use a timer and see your daily progress.
+        </p>
+
+    </div>
+
+
+    <!-- Login / Register 入口 -->
+    <div class="home-actions">
+
+        <h2>Get Started</h2>
+
+        <a href="{{ url_for('login') }}">
+            Login
+        </a>
+
+        <br><br>
+
+        <a href="{{ url_for('register') }}">
+            Register
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
