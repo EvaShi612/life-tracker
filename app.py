@@ -23,10 +23,19 @@ app.secret_key = "life-tracker-secret-key"
 # Home
 # =========================================================
 
+# =========================================================
+# Home
+# =========================================================
+
 @app.route("/")
 def home():
-    return "Life Tracker is running!"
 
+    # 如果已经登录，直接进入 Dashboard
+    if "user_email" in session:
+        return redirect(url_for("dashboard"))
+
+    # 如果还没登录，就进入 Login
+    return redirect(url_for("login"))
 
 # =========================================================
 # Login
