@@ -118,26 +118,47 @@ def dashboard():
 
     # -----------------------------------------------------
     # 查询当前用户所有 Habit
-    # action_id 用来连接 Habit 和 Activity Timer
+    # 同时计算每个 Habit 今天已经完成多少分钟
     # -----------------------------------------------------
 
     habits = conn.execute(
         """
         SELECT
-            id,
-            habit_name,
-            details,
-            category,
-            frequency,
-            goal_minutes,
-            color,
-            action_id
+            habits.id,
+            habits.habit_name,
+            habits.details,
+            habits.category,
+            habits.frequency,
+            habits.goal_minutes,
+            habits.color,
+            habits.action_id,
+
+            COALESCE(SUM(logs.duration_minutes), 0)
+                AS today_habit_minutes
+
         FROM habits
-        WHERE user_email = ?
+
+        LEFT JOIN logs
+            ON logs.habit_id = habits.id
+            AND logs.log_date = ?
+
+        WHERE habits.user_email = ?
+
+        GROUP BY
+            habits.id,
+            habits.habit_name,
+            habits.details,
+            habits.category,
+            habits.frequency,
+            habits.goal_minutes,
+            habits.color,
+            habits.action_id
         """,
-        (email,)
+        (
+            date.today().isoformat(),
+            email
+        )
     ).fetchall()
-    
 
     # -----------------------------------------------------
     # 查询今天总共记录了多少分钟

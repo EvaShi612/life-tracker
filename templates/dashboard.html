@@ -172,6 +172,24 @@ Recent Activity
             </p>
 
             <!--
+            显示这个 Habit 今天已经完成的分钟数
+            habit[8] = 今天这个 Habit 的 Activity 总分钟数
+            -->
+            <p>
+                Today: {{ habit[8] }} / {{ habit[5] }} minutes
+            </p>
+
+
+            <!-- 达到目标后显示完成状态 -->
+            {% if habit[8] >= habit[5] %}
+
+                <p>
+                    ✓ Completed today
+                </p>
+
+            {% endif %}
+
+            <!--
             habit[7] = action_id
             habit[0] = habit_id
 
