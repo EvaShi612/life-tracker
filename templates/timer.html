@@ -46,8 +46,6 @@ Timer 显示区域
     Reset
 </button>
 
-
-
 <!--
 Finish：
 结束计时，并把实际计时时长传到 Log Activity 页面。
@@ -117,21 +115,33 @@ Finish：
     // 完成这次 Activity
     function finishTimer() {
 
-    // 先暂停 Timer
+        // 先暂停 Timer
         clearInterval(timerInterval)
         timerInterval = null
 
-    // 把秒数转换成分钟
-    // Math.ceil 表示不足 1 分钟也算 1 分钟
+        // 把秒数转换成分钟
+        // Math.ceil 表示不足 1 分钟也算 1 分钟
         let minutes = Math.max(1, Math.ceil(seconds / 60))
 
-    // 跳到 Log Activity 页面
-    // 同时把 Timer 算出来的分钟数放进网址
-         window.location.href =
+        // 先建立 Log Activity 的网址
+        let logUrl =
             "{{ url_for('log_activity', action_id=action[0]) }}"
             + "?duration="
             + minutes
-}
+
+        // 如果这个 Timer 是从 Habit 开始的，
+        // 就继续把 habit_id 带到 Log Activity
+        {% if habit_id %}
+
+            logUrl =
+                logUrl
+                + "&habit_id={{ habit_id }}"
+
+        {% endif %}
+
+        // 跳转到 Log Activity
+        window.location.href = logUrl
+    }
 
 
     // 把总秒数转换成 hours : minutes : seconds

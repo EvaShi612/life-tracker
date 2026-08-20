@@ -593,11 +593,25 @@ def log_activity(action_id):
     ).fetchone()
 
 
-    # Activity 不存在
+    # 如果 Activity 不存在
     if not action:
         conn.close()
-
         return redirect(url_for("quick_actions"))
+
+
+    # -----------------------------------------------------
+    # 先取得 Timer 和 Habit 传过来的资料
+    # -----------------------------------------------------
+
+    # Timer 自动传来的分钟数
+    timer_duration = request.args.get("duration")
+
+    # 如果是从 Habit 开始的，
+    # URL 里会有 habit_id
+    habit_id = request.args.get("habit_id")
+
+    # 自动取得今天日期
+    today = date.today().isoformat()
 
 
     # -----------------------------------------------------
@@ -613,7 +627,9 @@ def log_activity(action_id):
         productivity = request.form.get("productivity")
         energy = request.form.get("energy")
 
-        # 把这一次 Activity 存进 logs 表
+        # hidden input 会把 habit_id 一起送回来
+        habit_id = request.form.get("habit_id")
+
         conn.execute(
             """
             INSERT INTO logs
@@ -625,9 +641,10 @@ def log_activity(action_id):
                 notes,
                 mood,
                 productivity,
-                energy
+                energy,
+                habit_id
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 session["user_email"],
@@ -637,37 +654,31 @@ def log_activity(action_id):
                 notes,
                 mood,
                 productivity,
-                energy
+                energy,
+                habit_id
             )
         )
 
         conn.commit()
         conn.close()
 
-        # 保存完成后直接回 Dashboard
         return redirect(url_for("dashboard"))
+
+
+    conn.close()
 
 
     # -----------------------------------------------------
     # GET：打开 Log Activity 页面
     # -----------------------------------------------------
 
-    # 如果用户从 Timer 页面过来，
-    # duration 会通过网址传过来
-    timer_duration = request.args.get("duration")
-
-    # 自动取得今天的日期
-    today = date.today().isoformat()
-
-    conn.close()
-
     return render_template(
         "log_activity.html",
         action=action,
         timer_duration=timer_duration,
-        today=today
+        today=today,
+        habit_id=habit_id
     )
-
 
 # =========================================================
 # Activities
@@ -787,15 +798,18 @@ def activity_timer(action_id):
 
     conn.close()
 
-
     # 如果 Activity 不存在
     if not action:
         return redirect(url_for("activities"))
 
+    # 如果是从 Habit 的 Start 按钮进来的，
+    # URL 里会带着 habit_id
+    habit_id = request.args.get("habit_id")
 
     return render_template(
         "timer.html",
-        action=action
+        action=action,
+        habit_id=habit_id
     )
 
 
