@@ -4,37 +4,52 @@
 
 <div class="home-page">
 
-    <!-- 网站主要介绍 -->
     <div class="home-intro">
 
-        <h1>Life Tracker</h1>
+        <p>YOUR PERSONAL LIFE TRACKER</p>
 
-        <h2>
-            Build better habits and track your progress.
-        </h2>
+        <h1>
+            Build better habits.
+            Track your time.
+            See your progress.
+        </h1>
 
         <p>
-            Organise your habits, track activities,
-            use a timer and see your daily progress.
+            Life Tracker helps you organise habits,
+            track activities, use a timer and understand
+            your daily progress in one place.
         </p>
+
+        <div class="home-buttons">
+
+            <a href="{{ url_for('login') }}">
+                Login
+            </a>
+
+            <a href="{{ url_for('register') }}">
+                Create Account
+            </a>
+
+        </div>
 
     </div>
 
 
-    <!-- Login / Register 入口 -->
-    <div class="home-actions">
+    <div class="home-preview">
 
-        <h2>Get Started</h2>
+        <h2>Life Tracker</h2>
 
-        <a href="{{ url_for('login') }}">
-            Login
-        </a>
+        <p>Today's Progress</p>
 
-        <br><br>
+        <h3>75 / 120 min</h3>
 
-        <a href="{{ url_for('register') }}">
-            Register
-        </a>
+        <p>🔥 4 day streak</p>
+
+        <hr>
+
+        <p>📘 Study Session</p>
+        <p>🏋️ Exercise</p>
+        <p>🌙 Rest & Sleep</p>
 
     </div>
 

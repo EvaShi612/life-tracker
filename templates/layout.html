@@ -1,9 +1,28 @@
 <!doctype html>
 <html>
+
 <head>
-  <title>Life Tracker</title>
+
+    <title>Life Tracker</title>
+
+    <!--
+    连接 static/style.css
+    所有继承 layout.html 的页面都会使用同一套样式
+    -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
 </head>
+
 <body>
-  {% block body %}{% endblock %}
+
+    <main class="page-container">
+        {% block body %}
+        {% endblock %}
+    </main>
+
 </body>
+
 </html>
